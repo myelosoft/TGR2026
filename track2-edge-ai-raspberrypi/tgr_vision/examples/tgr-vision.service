@@ -1,0 +1,17 @@
+# คัดลอกไปไว้ที่ /etc/systemd/system/tgr-vision.service (แก้ IP broker และชื่อทีม)
+[Unit]
+Description=TGR2026 Vision Node
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/tgr_vision
+ExecStart=/home/pi/tgr-venv/bin/python predict_pi.py \
+    --model seg_v3_960_ncnn_model --source csi --listen \
+    --mqtt 192.168.1.50 --team kmitl01 --out runs_live
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

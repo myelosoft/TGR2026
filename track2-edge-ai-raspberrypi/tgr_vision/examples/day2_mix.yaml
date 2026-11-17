@@ -1,0 +1,14 @@
+# แก้ <user> และชื่อคลาสให้ตรงกับ data/classes.txt
+path: /home/<user>/tgr_vision/data
+train:
+  - day2_yolo/images/train      # label จริงของผู้จัด
+  - synth/images/train          # กองสังเคราะห์
+val: day2_yolo/images/val       # วัดผลกับภาพจริงเท่านั้น
+names:
+  0: good
+  1: shell
+  2: full_black
+  3: husk
+  4: broken
+  5: parchment
+  6: immature

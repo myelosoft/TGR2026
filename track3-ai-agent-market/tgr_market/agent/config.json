@@ -1,0 +1,40 @@
+{
+  "base_url": "http://127.0.0.1:8000",
+  "team": "team_a",
+  "token": "token-team_a",
+  "poll_seconds": 1.0,
+  "llm": {
+    "enabled": true,
+    "base_url": "http://127.0.0.1:11434/v1",
+    "model": "qwen2.5:1.5b",
+    "api_key": "ollama",
+    "timeout_s": 20
+  },
+  "strategy": {
+    "base_price": 130,
+    "prior_band": {
+      "premium": [
+        0.95,
+        1.45
+      ],
+      "market": [
+        0.9,
+        1.25
+      ],
+      "low": [
+        0.85,
+        1.1
+      ]
+    },
+    "min_gap": 0.04,
+    "aggr_start": 0.85,
+    "aggr_end": 0.25,
+    "last_round_factor": 0.95,
+    "floor": 0.66,
+    "safety": {
+      "moisture": 0.1,
+      "defect": 0.005,
+      "cup": 0.3
+    }
+  }
+}

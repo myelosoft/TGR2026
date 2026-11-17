@@ -1,0 +1,8 @@
+# แก้ <user> และชื่อคลาสให้ตรงกับ data/classes.txt
+path: /home/<user>/tgr_vision/data
+train:
+  - day2_yolo/images/train
+  - day3_yolo/images/train
+  - synth_mixed/images/train
+val: day3_yolo/images/val
+names: {0: good, 1: shell, 2: full_black, 3: husk, 4: broken, 5: parchment, 6: immature}

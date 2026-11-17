@@ -1,0 +1,6 @@
+requests
+pydantic>=2
+fastapi
+uvicorn
+streamlit
+pandas

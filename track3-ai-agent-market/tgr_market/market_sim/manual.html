@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ตลาดกาแฟจำลอง · ขายด้วยมือ</title>
+<style>
+ body{font-family:system-ui,"Sarabun",sans-serif;margin:16px;max-width:1100px;color:#1f2328}
+ h1{font-size:20px;margin:0 0 8px} h2{font-size:16px;margin:18px 0 6px}
+ table{border-collapse:collapse;width:100%;font-size:14px} th,td{border:1px solid #d0d4da;padding:4px 6px;text-align:left}
+ th{background:#eef2f8} input,select,button{font:inherit;padding:3px 6px} .muted{color:#5b6168;font-size:13px}
+ .ok{color:#1a7f37}.bad{color:#cf222e} #bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+</style></head><body>
+<h1>ตลาดกาแฟจำลอง (ซ้อมขายด้วยมือ)</h1>
+<p class="muted">ตลาดสำหรับซ้อม ไม่ใช่ตลาดจริงของผู้จัด · ใส่ token ของทีม เช่น token-team_a</p>
+<div id="bar">Token <input id="tok" value="token-team_a" size="18"> <button onclick="load()">โหลดข้อมูล</button>
+ <span id="st"></span></div>
+<h2>ผู้ซื้อ</h2><table id="buyers"></table>
+<h2>ล็อตของทีม และข้อเสนอรอบนี้</h2>
+<table id="lots"></table>
+<p><button onclick="send()">ส่งข้อเสนอรอบนี้</button> <span id="msg"></span></p>
+<h2>ผลรอบก่อนหน้า</h2><table id="res"></table>
+<h2>ตารางคะแนน</h2><table id="lb"></table>
+<script>
+let S={}, BUY=[];
+const H=()=>({'X-Team-Token':document.getElementById('tok').value,'Content-Type':'application/json'});
+const j=async(u,o={})=>{const r=await fetch(u,{headers:H(),...o});const t=await r.json();if(!r.ok)throw new Error(t.detail||r.status);return t};
+function tbl(id,head,rows){document.getElementById(id).innerHTML='<tr>'+head.map(h=>'<th>'+h+'</th>').join('')+'</tr>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')}
+async function load(){
+ try{
+  S=await j('/api/state'); BUY=await j('/api/buyers'); const L=await j('/api/lots');
+  document.getElementById('st').textContent=`รอบ ${S.round}/${S.max_rounds} · เหลือ ${S.seconds_left} s`+(S.finished?' · จบเกมแล้ว':'');
+  tbl('buyers',['รหัส','ชื่อ','ความต้องการ','รับได้/รอบ'],BUY.map(b=>[b.id,b.name,b.description,b.capacity_per_round]));
+  const opt='<option value="">- ไม่เสนอ -</option>'+BUY.map(b=>`<option>${b.id}</option>`).join('');
+  tbl('lots',['ล็อต','kg','ความชื้น %','เมล็ดเสีย','cupping','สถานะ','เสนอให้','ราคา/kg'],L.map(l=>[l.lot_id,l.kg,l.sample.moisture_pct,l.sample.defect_ratio,l.sample.cupping_score,
+   l.status+(l.price_per_kg?` @${l.price_per_kg}`:''), l.status=='unsold'?`<select id="b_${l.lot_id}">${opt}</select>`:'', l.status=='unsold'?`<input id="p_${l.lot_id}" size="7">`:'']));
+  if(S.round>1||S.finished){const r=await j('/api/results?round='+(S.finished?S.max_rounds:S.round-1));
+   tbl('res',['ล็อต','ผู้ซื้อ','ราคา','ผล'],r.my_offers.map(o=>[o.lot_id,o.buyer_id,o.price_per_kg,`<span class="${o.result=='sold'?'ok':'bad'}">${o.result}</span>`]));}
+  const lb=await j('/api/leaderboard'); tbl('lb',['ทีม','ขายได้','รายได้','คะแนน'],lb.map(r=>[r.team,r.sold+'/'+r.lots,r.revenue,r.score??'-']));
+ }catch(e){document.getElementById('st').textContent='ผิดพลาด: '+e.message}
+}
+async function send(){
+ const offers=[...document.querySelectorAll('select[id^=b_]')].filter(s=>s.value).map(s=>{const id=s.id.slice(2);
+   return {lot_id:id,buyer_id:s.value,price_per_kg:parseFloat(document.getElementById('p_'+id).value)}});
+ try{const r=await j('/api/offers',{method:'POST',body:JSON.stringify({round:S.round,offers})});
+   document.getElementById('msg').innerHTML=`<span class="ok">ส่งแล้ว ${r.accepted_offers} ข้อเสนอ</span>`;}
+ catch(e){document.getElementById('msg').innerHTML=`<span class="bad">${e.message}</span>`}
+}
+load(); setInterval(()=>{if(S.round)j('/api/state').then(s=>{if(s.round!=S.round||s.finished!=S.finished)load();else document.getElementById('st').textContent=`รอบ ${s.round}/${s.max_rounds} · เหลือ ${s.seconds_left} s`})},2000);
+</script></body></html>
