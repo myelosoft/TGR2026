@@ -3,6 +3,8 @@
 ชุดฝึกปฏิบัติการ 3 Track สำหรับเตรียมตัวก่อนไปแข่ง **TESA Top Gun Rally #20 (TGR2026)**
 หัวข้อการแข่งขัน: *Chumphon Robusta AIoT Platform Toward The Next-Gen Market*
 
+![Sheet Track 1-3](images/TGRSheetNKR.png)
+
 Preparation lab sheets and source code for the three tracks of TGR2026: Embedded (ESP32), Edge AI (Raspberry Pi + YOLO26) and AI Agent (Python + LLM).
 
 > [!IMPORTANT]
